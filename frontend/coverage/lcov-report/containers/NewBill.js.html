@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/36</span>
+                <span class='fraction'>0/40</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/36</span>
+                <span class='fraction'>0/40</span>
             </div>
         
             
@@ -141,7 +141,15 @@
 <a name='L82'></a><a href='#L82'>82</a>
 <a name='L83'></a><a href='#L83'>83</a>
 <a name='L84'></a><a href='#L84'>84</a>
-<a name='L85'></a><a href='#L85'>85</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -171,20 +179,28 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -250,26 +266,34 @@ export default class NewBill {
       .files[0];
     const filePath = <span class="cstat-no" title="statement not covered" >e.target.value.split(/\\/g);</span>
     const fileName = <span class="cstat-no" title="statement not covered" >filePath[filePath.length - 1];</span>
-    const formData = <span class="cstat-no" title="statement not covered" >new FormData();</span>
-    const email = <span class="cstat-no" title="statement not covered" >JSON.parse(localStorage.getItem("user")).email;</span>
-<span class="cstat-no" title="statement not covered" >    formData.append("file", file);</span>
-<span class="cstat-no" title="statement not covered" >    formData.append("email", email);</span>
+    const fileExtension = <span class="cstat-no" title="statement not covered" >fileName.split(".")[1];</span>
+<span class="cstat-no" title="statement not covered" >    if (!["jpg", "jpeg", "png"].includes(fileExtension)) {</span>
+<span class="cstat-no" title="statement not covered" >      console.log("bad format");</span>
+<span class="cstat-no" title="statement not covered" >      this.document.querySelector("#error-file").textContent =</span>
+        "Le fichier que vous souhaitez envoyer n'est pas au bon format. Formats autorisés : jpg, jpeg, png";
+    } else {
+      const formData = <span class="cstat-no" title="statement not covered" >new FormData();</span>
+      const email = <span class="cstat-no" title="statement not covered" >JSON.parse(localStorage.getItem("user")).email;</span>
+<span class="cstat-no" title="statement not covered" >      formData.append("file", file);</span>
+<span class="cstat-no" title="statement not covered" >      formData.append("email", email);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    this.store</span>
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true,
-        },
-      })
-      .then(<span class="fstat-no" title="function not covered" >({</span> fileUrl, key }) =&gt; {
-<span class="cstat-no" title="statement not covered" >        this.billId = key;</span>
-<span class="cstat-no" title="statement not covered" >        this.fileUrl = fileUrl;</span>
-<span class="cstat-no" title="statement not covered" >        this.fileName = fileName;</span>
-      })
-      .catch(<span class="fstat-no" title="function not covered" >(e</span>rror) =&gt; <span class="cstat-no" title="statement not covered" >console.error(error))</span>;
+<span class="cstat-no" title="statement not covered" >      this.store</span>
+        .bills()
+        .create({
+          data: formData,
+          headers: {
+            noContentType: true,
+          },
+        })
+        .then(<span class="fstat-no" title="function not covered" >({</span> fileUrl, key }) =&gt; {
+<span class="cstat-no" title="statement not covered" >          this.billId = key;</span>
+<span class="cstat-no" title="statement not covered" >          this.fileUrl = fileUrl;</span>
+<span class="cstat-no" title="statement not covered" >          this.fileName = fileName;</span>
+        })
+        .catch(<span class="fstat-no" title="function not covered" >(e</span>rror) =&gt; <span class="cstat-no" title="statement not covered" >console.error(error))</span>;
+    }
   };
+&nbsp;
   handleSubmit = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(e</span>) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    e.preventDefault();</span>
 &nbsp;
@@ -316,7 +340,7 @@ export default class NewBill {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Sun Sep 17 2023 12:37:36 GMT+0200 (heure d’été d’Europe centrale)
+                at Sun Sep 17 2023 14:45:01 GMT+0200 (heure d’été d’Europe centrale)
             </div>
         </div>
         <script src="../prettify.js"></script>
