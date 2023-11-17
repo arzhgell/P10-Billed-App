@@ -1,4 +1,5 @@
 const jsonOrThrowIfError = async (response) => {
+  console.log(response);
   if (!response.ok) throw new Error((await response.json()).message);
   return response.json();
 };
@@ -9,7 +10,11 @@ class Api {
   }
   async get({ url, headers }) {
     return jsonOrThrowIfError(
-      await fetch(`${this.baseUrl}${url}`, { headers, method: "GET" })
+      await fetch(`${this.baseUrl}${url}`, { headers, method: "GET" }).catch(
+        (error) => {
+          throw new Error("Erreur 500");
+        }
+      )
     );
   }
   async post({ url, data, headers }) {

@@ -1,6 +1,11 @@
+import ErrorPage from "./ErrorPage.js";
 import VerticalLayout from "./VerticalLayout.js";
 
-export default () => {
+export default (error) => {
+  if (error) {
+    return ErrorPage(error);
+  }
+
   return `
     <div class='layout'>
       ${VerticalLayout(120)}

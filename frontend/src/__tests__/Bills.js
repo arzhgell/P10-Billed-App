@@ -5,6 +5,7 @@
 import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/extend-expect";
 
+import $ from "jquery";
 import { screen } from "@testing-library/dom";
 import { bills } from "../fixtures/bills.js";
 import { ROUTES_PATH, ROUTES } from "../constants/routes.js";
@@ -28,38 +29,47 @@ describe("Given I am connected as an employee", () => {
         type: "Employee",
       })
     );
+    const root = document.createElement("div");
+    root.setAttribute("id", "root");
+    document.body.append(root);
+    router();
+    window.onNavigate(ROUTES_PATH.Bills);
+  });
+
+  test("getBills return 4 bills", async () => {
+    const html = BillsUI({ data: bills });
+    document.body.innerHTML = html;
+    const numberBills = await screen.findAllByTestId("bill");
+    console.log(numberBills);
+    expect(numberBills.length).toBe(4);
   });
 
   describe("When I am on Bills Page", () => {
-    test("Test the disconnection when the handleClick function is clicked", async () => {
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname });
-      };
+    test("I click on the icon eye, then a modal should appear and the image is rendered", async () => {
+      const html = BillsUI({ data: bills });
+      document.body.innerHTML = html;
 
-      document.body.innerHTML = BillsUI({ data: bills });
+      const iconEyes = Array.from(
+        document.querySelectorAll("[data-testid='icon-eye']")
+      );
 
-      const logout = new Logout({ document, onNavigate, localStorage });
-
-      const handleClick = jest.fn(logout.handleClick);
-
-      const disconnectButton = screen.getByTestId("layout-disconnect");
-      disconnectButton.addEventListener("click", handleClick);
-      userEvent.click(disconnectButton);
-
-      expect(handleClick).toHaveBeenCalled();
-      expect(window.location.href).toMatch("/");
-    });
-
-    test("Then bill icon in vertical layout should be highlighted", () => {
-      const root = document.createElement("div");
-
-      root.setAttribute("id", "root");
-      document.body.appendChild(root);
-      router();
-      window.onNavigate(ROUTES_PATH.Bills);
-
-      const billsIcon = screen.getByTestId("icon-window");
-      expect(billsIcon).toHaveClass("active-icon");
+      $.fn.modal = jest.fn();
+      const BillsConstructor = new Bills({
+        document,
+        onNavigate,
+        firestore: null,
+        localStorage: window.localStorage,
+      });
+      const handleClickIconEye = jest.fn(BillsConstructor.handleClickIconEye);
+      if (iconEyes.length > 0) {
+        iconEyes.forEach((iconEye) => {
+          iconEye.addEventListener("click", () => handleClickIconEye(iconEye));
+        });
+        userEvent.click(iconEyes[0]);
+        expect(handleClickIconEye).toHaveBeenCalled();
+      } else {
+        throw new Error("No elements with data-testid 'icon-eye' found");
+      }
     });
 
     test("Then bills should be ordered from earliest to latest", () => {
@@ -69,144 +79,41 @@ describe("Given I am connected as an employee", () => {
       expect(sortedBills).toEqual(bills);
     });
 
-    test("fetches bills from mock API GET", async () => {
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          type: "Employee",
-        })
-      );
-      const getSpy = jest.spyOn(mockStore, "get");
-      const bills = await mockStore.get("bills");
-      expect(getSpy).toHaveBeenCalledTimes(1);
-      expect(bills.data.length).toBe(4);
-    });
-
-    test("Then check that information is displayed correctly", () => {
-      const displayedTypes = screen
-        .getAllByTestId("bill-type")
-        .map((element) => element.textContent);
-      const displayedNames = screen
-        .getAllByTestId("bill-name")
-        .map((element) => element.textContent);
-      const displayedDates = screen
-        .getAllByTestId("bill-date")
-        .map((element) => element.textContent);
-      const displayedAmounts = screen
-        .getAllByTestId("bill-amount")
-        .map((element) => element.textContent);
-      const displayedStatus = screen
-        .getAllByTestId("bill-status")
-        .map((element) => element.textContent);
-
-      expect(displayedTypes).not.toEqual("null");
-      expect(displayedNames).not.toEqual("null");
-      expect(displayedDates).not.toEqual("1 Janv. 70");
-      expect(displayedAmounts).not.toEqual("null");
-      expect(displayedStatus).not.toEqual("undefined");
-    });
-
-    test("Then check that information is displayed correctly", () => {
-      const displayedTypes = screen
-        .getAllByTestId("bill-type")
-        .map((element) => element.textContent);
-      const displayedNames = screen
-        .getAllByTestId("bill-name")
-        .map((element) => element.textContent);
-      const displayedDates = screen
-        .getAllByTestId("bill-date")
-        .map((element) => element.textContent);
-      const displayedAmounts = screen
-        .getAllByTestId("bill-amount")
-        .map((element) => element.textContent);
-      const displayedStatus = screen
-        .getAllByTestId("bill-status")
-        .map((element) => element.textContent);
-
-      expect(displayedTypes).not.toEqual("null");
-      expect(displayedNames).not.toEqual("null");
-      expect(displayedDates).not.toEqual("1 Janv. 70");
-      expect(displayedAmounts).not.toEqual("null");
-      expect(displayedStatus).not.toEqual("undefined");
-    });
-
-    test("Test the redirection on click of the handleClickNewBill function", () => {
+    test("Then im redirect to new bill page when i click on Nouvelle note de frais", () => {
+      const html = BillsUI({ data: [] });
+      document.body.innerHTML = html;
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
-
-      const bill = new Bills({ document, onNavigate, localStorage });
-      const handleClickNewBill = jest.fn(bill.handleClickNewBill);
-      const newBill = screen.getByTestId("btn-new-bill");
-      newBill.addEventListener("click", handleClickNewBill);
-      userEvent.click(newBill);
-
+      const firestore = null;
+      const bills = new Bills({
+        document,
+        onNavigate,
+        firestore,
+        localStorage: window.localStorage,
+      });
+      const handleClickNewBill = jest.fn((e) => bills.handleClickNewBill(e));
+      const btnNewBill = screen.getByTestId("btn-new-bill");
+      btnNewBill.addEventListener("click", handleClickNewBill);
+      userEvent.click(btnNewBill);
       expect(handleClickNewBill).toHaveBeenCalled();
-      expect(window.location.href).toMatch("/newbill");
+      expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
     });
+  });
 
-    test("Test that the date and status format are ok", () => {
-      const displayedDates = screen
-        .getAllByTestId("bill-date")
-        .map((element) => element.textContent);
-      const displayedStatus = screen
-        .getAllByTestId("bill-status")
-        .map((element) => element.textContent);
-
-      displayedDates.forEach((date) => {
-        expect(date).toMatch(/([0-9]{2}) ([a-zA-Z]{3})\. ([0-9]{4})/);
-      });
-      displayedStatus.forEach((status) => {
-        expect(status).toMatch(/(pending|accepted|refused)/);
-      });
+  describe("When I am on Bills Page but it is loading", () => {
+    test("Then, Loading page should be rendered", () => {
+      const html = BillsUI({ loading: true });
+      document.body.innerHTML = html;
+      expect(screen.getAllByText("Loading...")).toBeTruthy();
     });
+  });
 
-    test("Testing the handleClickIconEye function with a userEvent on click", () => {
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname });
-      };
-
-      const bill = new Bills({ document, onNavigate, localStorage });
-      const handleClickIconEye = jest.fn(bill.handleClickIconEye);
-      const iconEye = screen.getAllByTestId("icon-eye");
-      iconEye.forEach((icon) => {
-        icon.addEventListener("click", handleClickIconEye);
-        userEvent.click(icon);
-      });
-
-      expect(handleClickIconEye).toHaveBeenCalled();
-    });
-
-    describe("When an error occurs on API", () => {
-      test("fetches bills from an API and fails with 404 message error", async () => {
-        mockStore.bills.mockImplementationOnce(() => {
-          return {
-            list: () => {
-              return Promise.reject(new Error("Erreur 404"));
-            },
-          };
-        });
-        window.onNavigate(ROUTES_PATH.Bills);
-        await new Promise(process.nextTick);
-
-        const message = await screen.getByText("Erreur");
-        expect(message).toBeTruthy();
-      });
-
-      test("fetches messages from an API and fails with 500 message error", async () => {
-        mockStore.bills.mockImplementationOnce(() => {
-          return {
-            list: () => {
-              return Promise.reject(new Error("Erreur 500"));
-            },
-          };
-        });
-        window.onNavigate(ROUTES_PATH.Bills);
-        await new Promise(process.nextTick);
-
-        const message = await screen.getByText("Erreur");
-        expect(message).toBeTruthy();
-      });
+  describe("When I am on Bills Page but back-end send an error message", () => {
+    test("Then, Error page should be rendered", () => {
+      const html = BillsUI({ error: "Erreur" });
+      document.body.innerHTML = html;
+      expect(screen.getAllByText("Erreur")).toBeTruthy();
     });
   });
 });

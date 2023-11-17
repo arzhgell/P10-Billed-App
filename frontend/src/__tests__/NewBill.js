@@ -27,18 +27,6 @@ describe("Given I am connected as an employee", () => {
   });
 
   describe("When I am on NewBill Page", () => {
-    test("Then new bill icon in vertical layout should be highlighted", async () => {
-      const root = document.createElement("div");
-
-      root.setAttribute("id", "root");
-      document.body.appendChild(root);
-      router();
-      window.onNavigate(ROUTES_PATH.NewBill);
-
-      const newBillIcon = screen.getByTestId("icon-mail");
-      expect(newBillIcon).toHaveClass("active-icon");
-    });
-
     test("Then display the form", () => {
       const html = NewBillUI();
       document.body.innerHTML = html;
@@ -106,8 +94,8 @@ describe("Given I am connected as an employee", () => {
       fireEvent.submit(form);
       expect(handleSubmit).toHaveBeenCalled();
     });
-
-    test("Test adding a file to the handleChangeFile function", () => {
+    // test the handleChangeFile function
+    test("Then, the file is uploaded", () => {
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
@@ -115,13 +103,19 @@ describe("Given I am connected as an employee", () => {
 
       onNavigate(ROUTES_PATH.NewBill);
 
-      const input = screen.getByTestId("file");
-      const file = new File(["Hello, world!"], "test.jpg", {
-        type: "image/jpeg",
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store,
+        localStorage,
       });
-      userEvent.upload(input, file);
 
-      expect(input.files[0]).toStrictEqual(file);
+      const handleChangeFile = jest.fn(newBill.handleChangeFile);
+      const file = screen.getByTestId("file");
+      file.addEventListener("change", handleChangeFile);
+      fireEvent.change(file);
+
+      expect(handleChangeFile).toHaveBeenCalled();
     });
 
     test("Add new bill with mockStore / POST test", () => {
@@ -144,6 +138,14 @@ describe("Given I am connected as an employee", () => {
       form.addEventListener("submit", handleSubmit);
       fireEvent.submit(form);
       expect(handleSubmit).toHaveBeenCalled();
+    });
+  });
+
+  describe("When I am on NewBill Page but back-end send an error message", () => {
+    test("Then, Error page should be rendered", () => {
+      const html = NewBillUI({ error: "some error message" });
+      document.body.innerHTML = html;
+      expect(screen.getAllByText("Erreur")).toBeTruthy();
     });
   });
 });

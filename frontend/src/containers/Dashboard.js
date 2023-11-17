@@ -82,7 +82,7 @@ export default class {
   }
 
   handleClickIconEye = () => {
-    const billUrl = $("#icon-eye-d").attr("data-bill-url");
+    const billUrl = $("#icon-eye").attr("data-bill-url");
     const imgWidth = Math.floor($("#modaleFileAdmin1").width() * 0.8);
     $("#modaleFileAdmin1")
       .find(".modal-body")
@@ -94,6 +94,7 @@ export default class {
   };
 
   handleEditTicket(e, bill, bills) {
+    console.log(this.counter);
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0;
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id;
     console.log(this.counter);
@@ -112,9 +113,10 @@ export default class {
       `);
       $(".vertical-navbar").css({ height: "120vh" });
     }
-    $("#icon-eye-d").click(this.handleClickIconEye);
+    $("#icon-eye").click(this.handleClickIconEye);
     $("#btn-accept-bill").click((e) => this.handleAcceptSubmit(e, bill));
     $("#btn-refuse-bill").click((e) => this.handleRefuseSubmit(e, bill));
+    this.counter += 1;
   }
 
   handleAcceptSubmit = (e, bill) => {
